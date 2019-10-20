@@ -17,7 +17,7 @@ func (c *Count) BinMean() float64 {
 	return (c.Low + c.High) / 2
 }
 
-// RangeMeanCount returns the mean weighted average of the ranges of the Count struct
+// RangeMeanCount returns the mean weighted average of the ranges of the Count struct and the total count of that bin
 func (c *Count) RangeMeanCount() (float64, float64) {
 	var count, sumTotal float64
 
@@ -37,6 +37,7 @@ func (c *Count) RangeMeanCount() (float64, float64) {
 }
 
 // CheckBins checks of all the values in the Half and Full Slices are between the bin Low and High bounds
+// Returns true if OK
 func (c *Count) CheckBins() bool {
 
 	// Loop over half ranges

@@ -124,9 +124,20 @@ func GetCounts(half []float64, full []float64, r float64) []Count {
 	sort.Float64s(half)
 	sort.Float64s(full)
 
-	// Get the min and max
-	min := math.Min(half[0], full[0])
-	max := math.Max(half[len(half)-1], full[len(full)-1])
+	// Get the min and max - there could be empty half or full arrays
+	var min, max float64
+	if (len(half) > 0) && (len(full) > 0) {
+		min = math.Min(half[0], full[0])
+		max = math.Max(half[len(half)-1], full[len(full)-1])
+	} else {
+		if len(half) > 0 {
+			min = half[0]
+			max = half[len(half)-1]
+		} else {
+			min = full[0]
+			max = full[len(full)-1]
+		}
+	}
 
 	// Get lowest values within the bin
 	binLow := math.Floor(min/r) * r

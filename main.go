@@ -52,9 +52,9 @@ func main() {
 	fmt.Printf("Data points:\t\t%v\n", len(stress))
 	fmt.Printf("Peaks and troughs:\t%v\n\n", len(stripped))
 
-	fmt.Println("----------------------------------------")
+	fmt.Println("--------------------------------------------------------------------------")
 
-	fmt.Printf("Bin Low\tBin High\tBin Mean\tRange Mean\tCount\n")
+	fmt.Printf("Bin Low\t\tBin High\tBin Mean\tRange Mean\tCount\n")
 
 	// Print to console and write to the outfile
 	out, err := os.Create(*outpath)
@@ -70,12 +70,12 @@ func main() {
 		meanBin = k.BinMean()
 
 		if count > 0 {
-			fmt.Printf("%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n", k.Low, k.High, meanBin, meanRange, count)
+			fmt.Printf("%.2f\t\t%.2f\t\t%.2f\t\t%.2f\t\t%.2f\n", k.Low, k.High, meanBin, meanRange, count)
 			fmt.Fprintf(w, "%.5f,%.5f,%.5f,%.5f,%.5f\n", k.Low, k.High, meanBin, meanRange, count)
 		}
 	}
 	w.Flush()
 
-	fmt.Println("----------------------------------------")
+	fmt.Println("--------------------------------------------------------------------------")
 	fmt.Printf("Results written to file %v\n", *outpath)
 }
