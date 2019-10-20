@@ -47,10 +47,11 @@ func TestRainflowCounter(t *testing.T) {
 	}
 }
 
-func TestGetCounts(t *testing.T) {
+func TestGetMeanCounts(t *testing.T) {
 	testSlice := []float64{-2, 1, -3, 5, -1, 3, -4, 4, -2}
 	resultHalf, resultFull := RainflowCounting(testSlice)
-	result := GetCounts(resultHalf, resultFull, 1.0)
+	counts := GetCounts(resultHalf, resultFull, 1.0)
+	result := GetMeanCount(counts)
 
 	expected := map[float64]float64{
 		3: 0.5,

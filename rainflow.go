@@ -118,8 +118,6 @@ func RainflowCounting(p []float64) ([]float64, []float64) {
 // GetCounts takes the slice of half count ranges and full count ranges and returns a map of the
 // mean stress in that range, and the count
 // mode is an int that is currently either 1 or 2
-// 1 returns the bin mean value as the mid point between the upper and lower bound
-// 2 returns the mean of stress values within that bound
 func GetCounts(half []float64, full []float64, r float64) []Count {
 
 	// Sort the half and full slices into ascending order
@@ -200,4 +198,25 @@ func removeElement(s []float64, i int) []float64 {
 	s[len(s)-1] = 0      // Erase last element (write zero value).
 	s = s[:len(s)-1]     // Truncate slice.
 	return s
+}
+
+// GetMeanCount takes the list of counts created by GetCounts and returns
+// a map of range means and total counts
+func GetMeanCount(c []Count) map[float64]float64 {
+
+	// Initialise bin mean, count and the resulting map
+	var binMean, count float64
+	result := make(map[float64]float64)
+
+	for _, v := range c {
+
+		// Assert that there are non zero counts
+		if (len(v.Half) > 0) || (len(v.Full) > 0) {
+			binMean, count = v.RangeMeanCount()
+
+			result[binMean] = count
+		}
+	}
+
+	return result
 }
