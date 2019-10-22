@@ -61,8 +61,6 @@ func RainflowCounting(p []float64) ([]float64, []float64) {
 			// (1) - Read the next peak of valley
 			Y = p[i+1] - p[i]
 			X = p[i+2] - p[i+1]
-			// Log
-			// log.Printf("(1)\tX=%v\tY=%v\n", math.Abs(X), math.Abs(Y))
 
 			// (3a) X < Y
 			if math.Abs(X) < math.Abs(Y) {
@@ -74,8 +72,6 @@ func RainflowCounting(p []float64) ([]float64, []float64) {
 				if i == 0 {
 
 					// go to (5) - Count Y as a half cycle drop S
-					// log.Printf("(5)\t%v Counted as half cycle drop S\n", math.Abs(Y))
-
 					half = append(half, math.Abs(Y))
 					p = removeElement(p, 0)
 
@@ -85,7 +81,6 @@ func RainflowCounting(p []float64) ([]float64, []float64) {
 					full = append(full, math.Abs(Y))
 					p = removeElement(p, i)
 					p = removeElement(p, i)
-					// log.Printf("(4)\t%v counted as full cycle - Go to (1)\n", math.Abs(Y))
 					i = 0
 				}
 			}
@@ -97,27 +92,22 @@ func RainflowCounting(p []float64) ([]float64, []float64) {
 				}
 
 				half = append(half, math.Abs(p[i+1]-p[i]))
-				// log.Printf("(6)\t%v counted as half cycle", math.Abs(p[i+1]-p[i]))
-
 			}
 			return half, full
 		}
 		// Break conditions
 		if len(p) < 3 {
-			// log.Printf("Less than 3 cycles remaining - Count remaining as half cycles")
 			b = true
 		}
 		if i > len(p)-3 {
-			// log.Printf("No more data - Count remaining as half cycles")
 			b = true
 		}
 	}
 
 }
 
-// GetCounts takes the slice of half count ranges and full count ranges and returns a map of the
-// mean stress in that range, and the count
-// mode is an int that is currently either 1 or 2
+// GetCounts takes the slice of half count ranges, full count ranges and range interval r
+// and returns a list of Count structs representing the count of each bin. 
 func GetCounts(half []float64, full []float64, r float64) []Count {
 
 	// Sort the half and full slices into ascending order
@@ -145,10 +135,13 @@ func GetCounts(half []float64, full []float64, r float64) []Count {
 
 	// Create the Count objects
 	var countSlice []Count
+	
+	// Set initial bin low and high values
 	bL := binLow
 	bH := binLow + r
 	var c Count
-
+	
+	// Generate empty array of count objects
 	for {
 		c = Count{Low: bL,
 			High: bH,
@@ -164,8 +157,10 @@ func GetCounts(half []float64, full []float64, r float64) []Count {
 			break
 		}
 	}
-
+	
+	// binCounter is incremented as required
 	var binCounter int
+	
 	// Loop over half range
 	for _, v := range half {
 
@@ -178,6 +173,7 @@ func GetCounts(half []float64, full []float64, r float64) []Count {
 				binCounter++
 			}
 		}
+		// Add half ranges to this bin
 		countSlice[binCounter].Half = append(countSlice[binCounter].Half, v)
 	}
 
@@ -196,6 +192,7 @@ func GetCounts(half []float64, full []float64, r float64) []Count {
 				binCounter++
 			}
 		}
+		// Add full ranges to this bin
 		countSlice[binCounter].Full = append(countSlice[binCounter].Full, v)
 	}
 
