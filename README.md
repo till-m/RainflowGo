@@ -31,7 +31,7 @@ This example uses data from Figure 6 of ASTM E1049 85.
     5
     -1
     3
-    4
+    -4
     4
     -2
     ```
@@ -51,4 +51,4 @@ This example uses data from Figure 6 of ASTM E1049 85.
     ![](/img/output.png)
 * Bin low and Bin high are the lower and upper bounds respectivey, so for the example above, all stress ranges bewtween 3 and 4 are captured in the first row count.
 * Bin mean is the midpoint between the bin low and high values, this value does not vary.
-* Range mean is defined as the count weighted average of the ranges. For example, for the Bin between 5 and 6 the mean is 5.5 however there are no ranges with that amplitude. The only range present in this bin have an amplitude of 5 which is captured by the range mean.
+* Range mean is defined as the count weighted average of the ranges. For example, for the Bin between 4 and 5 the mean is 4.5 however there are no ranges with that amplitude. The only range present in this bin have an amplitude of 4 which is captured by the range mean.
