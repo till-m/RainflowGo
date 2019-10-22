@@ -12,8 +12,16 @@ An executable file for Linux64 and Win64 has been provided in the dist directory
 ### Optional
 `-o` Path to output file, this file will be created or overwritten and the results of the analysis will be written as a comma seperated table. If this flag is not provided no output file will be written. 
 
+### Build
+Alternatively you can build from source by running the following command in the ```RainflowGo``` directory
+```
+go build
+```
+
 ## Example
 This example uses data from Figure 6 of ASTM E1049 85. 
+
+<img src="img/figure_6.png" alt="figure 6" width="400px"/>
 
 1. First create a text file called `test_data.txt` with stress ranges in the format shown below 
     ```
@@ -41,5 +49,6 @@ This example uses data from Figure 6 of ASTM E1049 85.
 1. In the console this result will be shown. 
 
     ![](/img/output.png)
-    
-    The bin mean is the midpoint between the bin low and high values, where as the range mean is the count weighted sum of the stresses found within the bin. 
+* Bin low and Bin high are the lower and upper bounds respectivey, so for the example above, all stress ranges bewtween 3 and 4 are captured in the first row count.
+* Bin mean is the midpoint between the bin low and high values, this value does not vary.
+* Range mean is defined as the count weighted average of the ranges. For example, for the Bin between 5 and 6 the mean is 5.5 however there are no ranges with that amplitude. The only range present in this bin have an amplitude of 5 which is captured by the range mean.
