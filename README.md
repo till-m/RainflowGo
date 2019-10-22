@@ -4,6 +4,11 @@ Simple CLI tool to perform rainflow counting to ASTM E1049 85 written in Go
 ## Usage
 An executable file for Linux64 and Win64 has been provided in the dist directory. To use RainflowGo, you can run the executable with 3 flags
 
+Alternatively you can build from source by running the following command in the ```RainflowGo``` directory
+```
+go build
+```
+
 ### Required
 `-i` Path to the input text file, this should be the raw values of the series seperated by new lines, no commas. 
 
@@ -12,16 +17,11 @@ An executable file for Linux64 and Win64 has been provided in the dist directory
 ### Optional
 `-o` Path to output file, this file will be created or overwritten and the results of the analysis will be written as a comma seperated table. If this flag is not provided no output file will be written. 
 
-### Build
-Alternatively you can build from source by running the following command in the ```RainflowGo``` directory
-```
-go build
-```
 
 ## Example
 This example uses data from Figure 6 of ASTM E1049 85. 
 
-<img src="img/figure_6.png" alt="figure 6" width="400px"/>
+<img src="img/figure_6.png" alt="figure 6" width="600px"/>
 
 1. First create a text file called `test_data.txt` with stress ranges in the format shown below 
     ```
