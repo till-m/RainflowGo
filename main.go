@@ -15,7 +15,9 @@ func main() {
 	inpath := flag.String("i", "", "Path to input file containing line seperated data")
 	outpath := flag.String("o", "", "Path to output file where results will be stored")
 	stressrange := flag.Float64("r", 10.0, "The range of values that will be counted in the fatigue count")
+	start := flag.Int("s", 20, "Starting point for damage calculation.")
 
+	fmt.Println("Running...")
 	flag.Parse()
 
 	// Open the file and create the scanner
@@ -31,51 +33,46 @@ func main() {
 	var stressTemp float64
 
 	for scanner.Scan() {
-		stressTemp, _ = strconv.ParseFloat(scanner.Text(), 64)
+		stressTemp, err = strconv.ParseFloat(scanner.Text(), 64)
+		if err != nil {
+			panic(err)
+		}
 		stress = append(stress, stressTemp)
 	}
 
-	// Remove non-peaks from raw stress data
-	stripped := Peaks(stress)
-
-	// Perform Rainflow count to get half anf full counts
-	half, full := RainflowCounting(stripped)
-
-	// Get the counts of each
-	result := GetCounts(half, full, *stressrange)
-
-	// Write results to console
-	fmt.Println("Rainflow counter ASTM E1049 85 cl 5.4.4")
-	fmt.Println("----------------------------------------")
-	fmt.Printf("Input file:\t\t%v\n", *inpath)
-	fmt.Printf("Bin size:\t\t%.3f\n", *stressrange)
-	fmt.Printf("Data points:\t\t%v\n", len(stress))
-	fmt.Printf("Peaks and troughs:\t%v\n\n", len(stripped))
-
-	fmt.Println("--------------------------------------------------------------------------")
-
-	fmt.Printf("Bin Low\t\tBin High\tBin Mean\tRange Mean\tCount\n")
-
 	// Print to console and write to the outfile
 	out, err := os.Create(*outpath)
-	defer out.Close()
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		err := out.Close()
+		if err != nil {
+			panic(err)
+		}
+	}()
 
 	// Create new writer to write results to file
 	w := bufio.NewWriter(out)
-	fmt.Fprintf(w, "Bin Low,Bin High,Bin Mean,Range Mean,Count\n")
 
-	var count, meanRange, meanBin float64
-	for _, k := range result {
-		meanRange, count = k.RangeMeanCount()
-		meanBin = k.BinMean()
-
-		if count > 0 {
-			fmt.Printf("%.2f\t\t%.2f\t\t%.2f\t\t%.2f\t\t%.2f\n", k.Low, k.High, meanBin, meanRange, count)
-			fmt.Fprintf(w, "%.5f,%.5f,%.5f,%.5f,%.5f\n", k.Low, k.High, meanBin, meanRange, count)
-		}
+	for i := 0; i < *start; i++ {
+		outputResults(0, w)
 	}
-	w.Flush()
 
-	fmt.Println("--------------------------------------------------------------------------")
-	fmt.Printf("Results written to file %v\n", *outpath)
+	for i := *start + 1; i <= len(stress); i++ {
+		var damage = CalculateDamage(stress[:i], *stressrange)
+
+		outputResults(damage, w)
+	}
+
+	w.Flush()
+	fmt.Println("\tFinished...")
+}
+
+func outputResults(damage float64, w *bufio.Writer) {
+	_, err := fmt.Fprintf(w, "%e\n", damage)
+	if err != nil {
+		panic(err)
+	}
+	//fmt.Printf("%e\n", damage)
 }

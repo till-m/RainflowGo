@@ -107,7 +107,7 @@ func RainflowCounting(p []float64) ([]float64, []float64) {
 }
 
 // GetCounts takes the slice of half count ranges, full count ranges and range interval r
-// and returns a list of Count structs representing the count of each bin. 
+// and returns a list of Count structs representing the count of each bin.
 func GetCounts(half []float64, full []float64, r float64) []Count {
 
 	// Sort the half and full slices into ascending order
@@ -135,12 +135,12 @@ func GetCounts(half []float64, full []float64, r float64) []Count {
 
 	// Create the Count objects
 	var countSlice []Count
-	
+
 	// Set initial bin low and high values
 	bL := binLow
 	bH := binLow + r
 	var c Count
-	
+
 	// Generate empty array of count objects
 	for {
 		c = Count{Low: bL,
@@ -157,10 +157,10 @@ func GetCounts(half []float64, full []float64, r float64) []Count {
 			break
 		}
 	}
-	
+
 	// binCounter is incremented as required
 	var binCounter int
-	
+
 	// Loop over half range
 	for _, v := range half {
 
