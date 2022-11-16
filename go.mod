@@ -1,3 +1,3 @@
-module github.com/rainflow/seqdam
+module github.com/till-m/RainflowGo
 
 go 1.19
