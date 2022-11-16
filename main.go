@@ -37,7 +37,7 @@ func main() {
 
 	// Remove non-peaks from raw stress data
 	stripped := Peaks(stress)
-
+	var n_peaks int = stripped.Len()
 	// Perform Rainflow count to get half anf full counts
 	half, full := RainflowCounting(stripped)
 
@@ -50,7 +50,7 @@ func main() {
 	fmt.Printf("Input file:\t\t%v\n", *inpath)
 	fmt.Printf("Bin size:\t\t%.3f\n", *stressrange)
 	fmt.Printf("Data points:\t\t%v\n", len(stress))
-	fmt.Printf("Peaks and troughs:\t%v\n\n", len(stripped))
+	fmt.Printf("Peaks and troughs:\t%v\n\n", n_peaks)
 
 	fmt.Println("--------------------------------------------------------------------------")
 

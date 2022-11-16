@@ -1,16 +1,17 @@
 package main
 
 import (
+	"container/list"
 	"math"
 	"sort"
 )
 
 // Peaks takes a list of the raw stress values and removes all
 // intermediate values which are not peaks or troughs
-func Peaks(s []float64) []float64 {
+func Peaks(s []float64) *list.List {
 
 	// Output slice
-	var stripped []float64
+	var stripped = list.New()
 
 	// Value of the change in stress
 	var ds float64
@@ -20,7 +21,7 @@ func Peaks(s []float64) []float64 {
 
 		// If its the first value, append it
 		if i == 0 {
-			stripped = append(stripped, v)
+			stripped.PushBack(v)
 		} else {
 
 			// if ds is 0 cant divide by
@@ -31,13 +32,13 @@ func Peaks(s []float64) []float64 {
 
 			// If the current ds is a different sign
 			if (v-s[i-1])/ds < 0 {
-				stripped = append(stripped, s[i-1])
+				stripped.PushBack(s[i-1])
 				ds = v - s[i-1]
 			}
 		}
 	}
 	// Append the final value
-	stripped = append(stripped, s[len(s)-1])
+	stripped.PushBack(s[len(s)-1])
 
 	return stripped
 }
@@ -45,10 +46,9 @@ func Peaks(s []float64) []float64 {
 // RainflowCounting takes a set of peaks only - should be processed by peaks()
 // returns a slice of half cycles and whole cycles
 // as per ASTM E1049 85 Cl 5.4.4
-func RainflowCounting(p []float64) ([]float64, []float64) {
-
+func RainflowCounting(p *list.List) ([]float64, []float64) {
+	var e_i = p.Front()
 	var X, Y float64
-	var i int = 0
 
 	// Slices of half and full to append ranges to
 	var half, full []float64
@@ -59,55 +59,62 @@ func RainflowCounting(p []float64) ([]float64, []float64) {
 	for {
 		if b == false {
 			// (1) - Read the next peak of valley
-			Y = p[i+1] - p[i]
-			X = p[i+2] - p[i+1]
+			var e_i1 = e_i.Next()
+			var e_i2 = e_i1.Next()
+			if e_i2 == nil {
+				b = true
+				continue
+			}
+
+			Y = e_i1.Value.(float64) - e_i.Value.(float64)
+			X = e_i2.Value.(float64) - e_i1.Value.(float64)
 
 			// (3a) X < Y
 			if math.Abs(X) < math.Abs(Y) {
 				// go to (1)
-				i++
+				e_i = e_i.Next()
+				continue
 			} else {
 				// X >= Y go to (4)
 				// If range Y contains the starting point S
-				if i == 0 {
+				if p.Front() == e_i {
 
 					// go to (5) - Count Y as a half cycle drop S
 					half = append(half, math.Abs(Y))
-					p = removeElement(p, 0)
+					p.Remove(p.Front())
 
-					i = 0
+					e_i = p.Front()
 				} else {
 					// (4) Remove the peak and the valley of Y and count as full cycle
 					full = append(full, math.Abs(Y))
-					p = removeElement(p, i)
-					p = removeElement(p, i)
-					i = 0
+					p.Remove(e_i.Next())
+					p.Remove(e_i)
+
+					e_i = p.Front()
 				}
 			}
 		} else {
-			// Collect reamaining cycles and attribute them to half cycles
-			for i := range p {
-				if i == len(p)-1 {
+			// Collect remaining cycles and attribute them to half cycles
+			for true {
+				e_i = p.Front()
+				if p.Len() == 1 {
 					break
 				}
-
-				half = append(half, math.Abs(p[i+1]-p[i]))
+				half = append(half, math.Abs(e_i.Next().Value.(float64)-e_i.Value.(float64)))
+				p.Remove(e_i)
 			}
+
 			return half, full
 		}
 		// Break conditions
-		if len(p) < 3 {
-			b = true
-		}
-		if i > len(p)-3 {
+		if p.Len() < 3 {
 			b = true
 		}
 	}
-
 }
 
 // GetCounts takes the slice of half count ranges, full count ranges and range interval r
-// and returns a list of Count structs representing the count of each bin. 
+// and returns a list of Count structs representing the count of each bin.
 func GetCounts(half []float64, full []float64, r float64) []Count {
 
 	// Sort the half and full slices into ascending order
@@ -135,12 +142,12 @@ func GetCounts(half []float64, full []float64, r float64) []Count {
 
 	// Create the Count objects
 	var countSlice []Count
-	
+
 	// Set initial bin low and high values
 	bL := binLow
 	bH := binLow + r
 	var c Count
-	
+
 	// Generate empty array of count objects
 	for {
 		c = Count{Low: bL,
@@ -157,10 +164,10 @@ func GetCounts(half []float64, full []float64, r float64) []Count {
 			break
 		}
 	}
-	
+
 	// binCounter is incremented as required
 	var binCounter int
-	
+
 	// Loop over half range
 	for _, v := range half {
 
